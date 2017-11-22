@@ -1,0 +1,52 @@
+// Implement a fragment shader for Gauraud shading
+#version 120
+
+varying vec3 fragcolor;
+varying vec3 vPosition;
+varying vec3 vNormal;
+varying vec3 vForeColor;
+varying vec3 vBackColor;
+
+//constant for the whole mesh
+uniform mat4 M;
+uniform mat4 V;
+uniform mat4 normat;
+uniform vec3 ligposwld;
+uniform vec3 ligcolor;
+
+uniform float uMaterialShininess;
+uniform vec3 uAmbientColor;
+uniform vec3 uPointLightingLocation;
+uniform vec3 uPointLightingSpecularColor;
+uniform vec3 uPointLightingDiffuseColor;
+
+void main()
+{
+    vec3 normal = vNormal;
+    int frontCond = -(1 - int(gl_FrontFacing) * 2);
+    normal = vNormal * frontCond;
+
+
+    vec3 lightWeighting;
+    vec3 lightDirection = normalize(uPointLightingLocation - vPosition.xyz);
+    float specularLightWeighting;
+    vec3 eyeDirection = normalize(-vPosition.xyz);
+    vec3 reflectionDirection = reflect(-lightDirection, normal);
+
+    specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), uMaterialShininess);
+    float diffuseLightWeighting = max(dot(normal, lightDirection), 0.0);
+
+    lightWeighting = uAmbientColor
+        + uPointLightingSpecularColor * specularLightWeighting
+        + uPointLightingDiffuseColor * diffuseLightWeighting;
+
+    vec3 color;
+    if (gl_FrontFacing) {
+        color = fragcolor;
+    }
+    else {
+//        color = vBackColor;
+        color = fragcolor;
+    }
+    gl_FragColor = vec4(color.rgb * lightWeighting, 1.0);;// = vec4(fragcolor, 1.0 );
+}

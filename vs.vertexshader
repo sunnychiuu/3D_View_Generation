@@ -1,0 +1,37 @@
+//This is a vertex shader for "Flat Shading"
+#version 120
+// Input vert data, different for all executions of this shader.
+attribute vec3 vertposmdl;
+attribute vec3 vertcolor;
+attribute vec3 vertnormdl;
+
+//varibles interpolated on frag shader
+varying vec3 fragcolor;
+varying vec3 vPosition;
+varying vec3 vNormal;
+varying vec3 vForeColor;
+varying vec3 vBackColor;
+
+
+
+//constant for the whole mesh
+uniform mat4 PVM;
+uniform mat4 M;
+uniform mat4 V;
+uniform mat4 normat;
+uniform vec3 ligposwld;
+uniform vec3 ligcolor;
+uniform vec3 uForeColor;
+uniform vec3 uBackColor;
+
+void main(){
+	fragcolor = vertcolor;
+    vForeColor = vertcolor;
+    vBackColor = uBackColor; 
+
+	gl_Position = PVM * vec4(vertposmdl, 1.0);
+
+	vPosition = (V * M * vec4(vertposmdl, 1.0)).xyz;
+    vNormal = vertnormdl; 
+    
+}
